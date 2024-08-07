@@ -1,0 +1,110 @@
+import java.util.Scanner;
+import java.util.HashMap;
+import java.util.Map;
+
+public class OnlineReservationSystem {
+    
+    // Dummy data for demonstration purposes
+    private static Map<String, String> userDatabase = new HashMap<>();
+    private static Map<String, String> trainDatabase = new HashMap<>();
+    private static Map<String, String> reservationDatabase = new HashMap<>();
+    
+    public static void main(String[] args) {
+        // Initial data
+        userDatabase.put("user1", "password1");
+        userDatabase.put("user2", "password2");
+        
+        trainDatabase.put("12345", "Train A");
+        trainDatabase.put("67890", "Train B");
+        
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.println("Welcome to the Online Reservation System");
+        
+        if (login(scanner)) {
+            boolean exit = false;
+            while (!exit) {
+                System.out.println("1. Make a Reservation");
+                System.out.println("2. Cancel a Reservation");
+                System.out.println("3. Exit");
+                System.out.print("Enter your choice: ");
+                int choice = scanner.nextInt();
+                scanner.nextLine();  // consume newline
+                
+                switch (choice) {
+                    case 1:
+                        makeReservation(scanner);
+                        break;
+                    case 2:
+                        cancelReservation(scanner);
+                        break;
+                    case 3:
+                        exit = true;
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                }
+            }
+        } else {
+            System.out.println("Invalid login credentials. Exiting system.");
+        }
+        
+        scanner.close();
+    }
+    
+    private static boolean login(Scanner scanner) {
+        System.out.print("Enter login ID: ");
+        String loginId = scanner.nextLine();
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+        
+        if (userDatabase.containsKey(loginId) && userDatabase.get(loginId).equals(password)) {
+            System.out.println("Login successful.");
+            return true;
+        } else {
+            System.out.println("Login failed.");
+            return false;
+        }
+    }
+    
+    private static void makeReservation(Scanner scanner) {
+        System.out.print("Enter your name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter train number: ");
+        String trainNumber = scanner.nextLine();
+        
+        String trainName = trainDatabase.get(trainNumber);
+        if (trainName == null) {
+            System.out.println("Invalid train number.");
+            return;
+        }
+        
+        System.out.print("Enter class type: ");
+        String classType = scanner.nextLine();
+        System.out.print("Enter date of journey (YYYY-MM-DD): ");
+        String dateOfJourney = scanner.nextLine();
+        System.out.print("Enter departure place: ");
+        String from = scanner.nextLine();
+        System.out.print("Enter destination: ");
+        String to = scanner.nextLine();
+        
+        String reservationId = "PNR" + (reservationDatabase.size() + 1);
+        reservationDatabase.put(reservationId, String.format(
+                "Name: %s, Train: %s (%s), Class: %s, Date: %s, From: %s, To: %s",
+                name, trainNumber, trainName, classType, dateOfJourney, from, to));
+        
+        System.out.println("Reservation successful. Your PNR is: " + reservationId);
+    }
+    
+    private static void cancelReservation(Scanner scanner) {
+        System.out.print("Enter PNR number: ");
+        String pnr = scanner.nextLine();
+        
+        String reservation = reservationDatabase.remove(pnr);
+        if (reservation != null) {
+            System.out.println("Reservation cancelled: " + reservation);
+        } else {
+            System.out.println("Invalid PNR number.");
+        }
+    }
+}
