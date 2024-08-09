@@ -1,0 +1,148 @@
+import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class OnlineExamination {
+    private String username;
+    private String password;
+    private String name;
+    private String email;
+    private boolean loggedIn;
+    private int score;
+
+    public OnlineExamination(String username, String password, String name, String email) {
+        this.username = username;
+        this.password = password;
+        this.name = name;
+        this.email = email;
+        this.loggedIn = false;
+        this.score = 0;
+    }
+
+    public static void main(String[] args) {
+        OnlineExamination examSystem = new OnlineExamination("student", "password123", "Student Name", "student@example.com");
+        examSystem.showMenu();
+    }
+
+    public void showMenu() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Welcome to the Online Examination System!");
+        System.out.print("Enter Username: ");
+        String enteredUsername = scanner.nextLine();
+        System.out.print("Enter Password: ");
+        String enteredPassword = scanner.nextLine();
+
+        if (authenticate(enteredUsername, enteredPassword)) {
+            loggedIn = true;
+            System.out.println("Login successful!");
+            int option;
+
+            do {
+                System.out.println("\nMenu:");
+                System.out.println("1. Update Profile");
+                System.out.println("2. Change Password");
+                System.out.println("3. Start Examination");
+                System.out.println("4. Logout");
+                System.out.print("Choose an option: ");
+                option = scanner.nextInt();
+
+                switch (option) {
+                    case 1:
+                        updateProfile();
+                        break;
+                    case 2:
+                        changePassword();
+                        break;
+                    case 3:
+                        startExamination();
+                        break;
+                    case 4:
+                        logout();
+                        break;
+                    default:
+                        System.out.println("Invalid option. Please try again.");
+                }
+            } while (option != 4);
+        } else {
+            System.out.println("Login failed! Invalid username or password.");
+        }
+    }
+
+    private boolean authenticate(String username, String password) {
+        return this.username.equals(username) && this.password.equals(password);
+    }
+
+    private void updateProfile() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter new name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter new email: ");
+        String email = scanner.nextLine();
+        this.name = name;
+        this.email = email;
+        System.out.println("Profile updated successfully!");
+    }
+
+    private void changePassword() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter old password: ");
+        String oldPassword = scanner.nextLine();
+        if (authenticate(username, oldPassword)) {
+            System.out.print("Enter new password: ");
+            String newPassword = scanner.nextLine();
+            this.password = newPassword;
+            System.out.println("Password changed successfully!");
+        } else {
+            System.out.println("Old password is incorrect!");
+        }
+    }
+
+    private void startExamination() {
+        System.out.println("Examination started!");
+        String[] questions = {
+            "1. What is the capital of France?\n(a) Paris\n(b) London\n(c) Berlin\n(d) Madrid",
+            "2. What is 2 + 2?\n(a) 3\n(b) 4\n(c) 5\n(d) 6",
+            "3. What is the largest planet in our solar system?\n(a) Earth\n(b) Mars\n(c) Jupiter\n(d) Saturn"
+        };
+        char[] answers = {'a', 'b', 'c'};
+        char[] userAnswers = new char[questions.length];
+        Scanner scanner = new Scanner(System.in);
+
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println("\nTime's up! The exam will be auto-submitted.");
+                submitAnswers(questions, answers, userAnswers);
+            }
+        };
+
+        timer.schedule(task, 60000);  // Set timer for 60 seconds
+
+        for (int i = 0; i < questions.length; i++) {
+            System.out.println(questions[i]);
+            System.out.print("Your answer: ");
+            userAnswers[i] = scanner.next().charAt(0);
+        }
+
+        timer.cancel();  // Cancel the timer if user submits before time runs out
+        submitAnswers(questions, answers, userAnswers);
+    }
+
+    private void submitAnswers(String[] questions, char[] answers, char[] userAnswers) {
+        for (int i = 0; i < questions.length; i++) {
+            if (userAnswers[i] == answers[i]) {
+                score++;
+            }
+        }
+        System.out.println("Exam submitted. Your score: " + score + "/" + questions.length);
+    }
+
+    private void logout() {
+        loggedIn = false;
+        System.out.println("Logged out successfully!");
+    }
+}
+
+
